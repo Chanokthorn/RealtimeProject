@@ -4,8 +4,15 @@
 // Create an empty scene
 // test push
 
+
+
+// object.createObject('sphere');
+
 var scene = new THREE.Scene();
 
+var objects = new Objects();
+
+objects.create();
 
 // Create a basic perspective camera
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
@@ -24,20 +31,20 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 // fundamental functions
-function applyGravity(){
-    objects.map((obj) => {
-        if(!objectIsStatic[obj.id]) objectVelocity[obj.id].y += 0.01;
-    });
-}
+// function applyGravity(){
+//     objects.map((obj) => {
+//         if(!objectIsStatic[obj.id]) objectVelocity[obj.id].y += 0.01;
+//     });
+// }
 
-function applyVelociity(){
-    objects.map( (obj) => {
-        objId = obj.id;
-        obj.position.x -= (objectVelocity[objId].x);
-        obj.position.y -= (objectVelocity[objId].y);
-        obj.position.z -= objectVelocity[objId].z;
-    });
-}
+// function applyVelociity(){
+//     objects.map( (obj) => {
+//         objId = obj.id;
+//         obj.position.x -= (objectVelocity[objId].x);
+//         obj.position.y -= (objectVelocity[objId].y);
+//         obj.position.z -= objectVelocity[objId].z;
+//     });
+// }
 // end of fundametal functions
 
 // keyboard listener
@@ -58,23 +65,24 @@ function onDocumentKeyDown(event) {
         plane.rotation.x += 0.1;
     } else if (keyCode == 76){
         plane.rotation.x -= 0.1;
+    } else if (keyCode == 50){
+        camera.position.x -= 0.5;
+    } else if (keyCode == 51){
+        camera.position.y -= 0.5;
+        console.log('up');
+    } else if (keyCode == 52){
+        camera.position.x += 0.5;
+    } else if (keyCode == 53){
+        camera.position.y += 0.5;
     }
 };
 
 // arrays of velocity and states of each object, key is each object's id
 var objectVelocity = {};
 var objectIsStatic = {};
-var objects = [];
 
 // Create objects
-var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var sphere_geometry = new THREE.SphereGeometry(1,10,10);
-var material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
-var cube = new THREE.Mesh( geometry, material );
-objectIsStatic[cube.id] = false;
-var sphere = new THREE.Mesh(sphere_geometry, material);
-objectIsStatic[sphere.id] = false;
-sphere.position.set( 1, 1, 1 );
+
 
 var planeGeometry = new THREE.PlaneBufferGeometry( 10, 5, 5, 5 );
 var planeMaterial = new THREE.MeshBasicMaterial( { color: "#103F97" } )
@@ -84,25 +92,19 @@ plane.rotation.x -= 1;
 plane.position.set( 1, -1.5, 1 );
 objectIsStatic[plane.id] = true;
 
-objects.push( cube, sphere, plane );
 
 // Add cube to Scene
-objects.map((obj) => {
-    console.log('object: ',obj)
-    scene.add( obj );
-    objectVelocity[obj.id] = { x: 0, y: 0, z: 0};
-});
+// objects.map((obj) => {
+//     console.log('object: ',obj)
+//     scene.add( obj );
+//     objectVelocity[obj.id] = { x: 0, y: 0, z: 0};
+// });
 
 // Render Loop
 var render = function () {
   requestAnimationFrame( render );
-  applyVelociity();
-  try{applyGravity()}
-  catch{console.log('Gravity Error')}
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
   // Render the scene
+  objects.update();
   renderer.render(scene, camera);
 };
 
