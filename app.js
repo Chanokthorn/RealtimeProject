@@ -92,7 +92,6 @@ plane.rotation.x -= 1;
 plane.position.set( 1, -1.5, 1 );
 objectIsStatic[plane.id] = true;
 
-
 // Add cube to Scene
 // objects.map((obj) => {
 //     console.log('object: ',obj)
