@@ -1,54 +1,63 @@
-function Objects(){
+function World(){
   var objects = {};
+  const gravity = -0.008;
   // this.velocities = {};
   // this.accelerations = {};
   var objectIndex = 0;
   var createObject = function(type = 'sphere'){
     console.log('create');
-    var geometry;
-    var material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
-    if(type = "sphere"){
-      geometry = new THREE.SphereGeometry(1,10,10);   
+    var geometry, material, pos;
+    var vel = { x: 0, y: 0, z: 0};
+    var acc = { x: 0, y: gravity, z: 0};
+    var mass = 1;
+    var static = false;
+    if(type == "plane"){
+      geometry = new THREE.PlaneGeometry( 10, 1);
+      material = new THREE.MeshBasicMaterial( { color: "#103F97" } );
+      pos = {x: 1, y: -1.5, z: 1};
+      static = true;
+    } else if(type = "sphere"){
+      geometry = new THREE.SphereGeometry(1,10,10);
+      material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
+      pos = {x: 0.5, y: 10, z: 1};
     }
     else{
       geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
+      pos = {x: 0.5, y: 1, z: 1};
     }
-    var newObject= (new THREE.Mesh( geometry, material ));
-    newObject.position.set(0.5, 1, 1);
-    scene.add(newObject);
-    var boundingBox = {}
-    boundingBox.minX = newObject.position.x - 1;
-    boundingBox.maxX = newObject.position.x + 1;
-    boundingBox.minY = newObject.position.y - 1;
-    boundingBox.maxY = newObject.position.y + 1;
-    boundingBox.minZ = newObject.position.z - 1;
-    boundingBox.maxZ = newObject.position.z + 1;
-    newObject.boundingBox = boundingBox;
-    console.log(boundingBox);
-    objects[objectIndex] = { 
-      object: newObject,
-      vel: { x: 0, y: 0, z: 0},
-      acc: { x: 0, y: -0.01, z: 0}
+    var newMesh = new THREE.Mesh(geometry, material);
+    newMesh.position.set(pos.x, pos.y, pos.z)
+    scene.add(newMesh);
+    objects[objectIndex++] = { 
+      mesh: newMesh,
+      type: type,
+      mass: mass,
+      pos: pos,
+      vel: vel,
+      acc: acc,
+      static: static
     };
   }
   var updatePosition = function(){
     for(var key in objects){
-      var currObj = objects[key].object;
-      currObj.position.x += objects[key].vel.x;
-      currObj.position.y += objects[key].vel.y;
-      currObj.position.z += objects[key].vel.z;
-      objects[key].vel.x += objects[key].acc.x;
-      objects[key].vel.y += objects[key].acc.y;
-      objects[key].vel.z += objects[key].acc.z
-      if (intersect(objects[key], plane)){
-        console.log('intersect');
+      var currObj = objects[key];
+      if(currObj.static){
+        continue;
+      }
+      currObj.pos.x += currObj.vel.x;
+      currObj.pos.y += currObj.vel.y;
+      currObj.pos.z += currObj.vel.z;
+      currObj.vel.x += currObj.acc.x;
+      currObj.vel.y += currObj.acc.y;
+      currObj.vel.z += currObj.acc.z;
+      
+      currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z)
+
+      if(currObj.pos.y < objects[0].pos.y + 1){
+        currObj.static = true;
       }
     }
-  }
-  function intersect(a, b) {
-    return (a.boundingBox.minX <= b.boundingBox.maxX && a.boundingBox.maxX >= b.boundingBox.minX) &&
-           (a.boundingBox.minY <= b.boundingBox.maxY && a.boundingBox.maxY >= b.boundingBox.minY) &&
-           (a.boundingBox.minZ <= b.boundingBox.maxZ && a.boundingBox.maxZ >= b.boundingBox.minZ);
   }
 
   return{
