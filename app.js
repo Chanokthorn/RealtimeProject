@@ -58,9 +58,10 @@ function onDocumentKeyDown(event) {
 var objectVelocity = {};
 var objectIsStatic = {};
 
-world.create("plane");
+world.create("plane", {x: 1.0, y: -1.5, z: 1.0}, true);
 world.create();
 
+var plane = objects[0]
 // Render Loop
 var render = function () {
   requestAnimationFrame( render );
