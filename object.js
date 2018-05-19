@@ -48,7 +48,7 @@ function World(){
   var compute_moment_of_inertia = function(object){
     if (object.type === "sphere"){
       object.moment_of_inertia = 2.0 / 5.0 * object.mass * object.mesh.geometry.parameters.radius ** 2;
-    }else if(object.type === "box"){
+    } else if(object.type === "box"){
       object.moment_of_inertia = 1.0 / 12.0 * object.mass * (object.mesh.geometry.parameters.width ** 2 + 
                                                               object.mesh.geometry.parameters.height ** 2);
     }
@@ -67,10 +67,12 @@ function World(){
       currObj.vel.y += currObj.acc.y;
       currObj.vel.z += currObj.acc.z;
       
-      currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z)
+      currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
       if(currObj.pos.y < objects[0].pos.y + 1.0){
-        currObj.static = true;
+        currObj.vel.x *= - 0.99;
+        currObj.vel.y *= - 0.99;
+        currObj.vel.z *= - 0.99;
       }
     }
   }

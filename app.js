@@ -58,7 +58,7 @@ function onDocumentKeyDown(event) {
 var objectVelocity = {};
 var objectIsStatic = {};
 
-world.create("plane", {x: 1.0, y: -1.5, z: 1.0}, true);
+world.create("plane", {x: 1.0, y: -1.5, z: 1.0}, {x: 0, y: 0,z: 0}, true);
 world.create();
 
 var plane = objects[0]
