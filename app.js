@@ -59,7 +59,8 @@ var objectVelocity = {};
 var objectIsStatic = {};
 
 world.create("plane", {x: 1.0, y: -1.5, z: 1.0}, true);
-world.create();
+world.create("sphere",{x: 2, y: 10.0, z: 1.0}, {x: -0.01, y: 0, z: 0});
+world.create("sphere",{x: -2, y: 10.0, z: 1.0}, {x: 0.01, y: 0, z: 0});
 
 var plane = objects[0]
 // Render Loop
