@@ -2,38 +2,36 @@ function World(){
   var objects = {};
   // const gravity = -0.008;
   const gravity = 0;
-  var zero = {x: 0.0,
-                y: 0.0,
-                z: 0.0}
   // this.velocities = {};
   // this.accelerations = {};
   var objectIndex = 0;
   var createObject = function(type = 'sphere', 
-                              pos = {x: 0, y: 0, z: 0}, 
-                              force = {x: 0, y: 0, z: 0},
-                              rot = zero, 
+                              pos = new THREE.Vector3(), 
+                              force = new THREE.Vector3(),
+                              rot = new THREE.Vector3(), 
                               static = false, 
-                              mass = 1.0) {
+                              mass = 1.0,
+                              color) {
     console.log('create');
-    console.log(pos)
     var geometry, material;
-    var vel = {x: 0.0, y: 0.0, z: 0.0};
-    var acc = {x: 0.0, y: gravity, z: 0.0};
+    var vel = new THREE.Vector3();
+    var acc = THREE.Vector3(0.0, gravity, 0.0);
     if(type === "plane"){
+      color = color || "#103F97"
       geometry = new THREE.PlaneGeometry(10, 1);
-      material = new THREE.MeshBasicMaterial( { color: "#103F97" } );
+      material = new THREE.MeshBasicMaterial( { color:  color} );
     } else if(type === "sphere"){
+      color = color || "#433F81"
       geometry = new THREE.SphereGeometry(1.0, 10.0, 10.0);
-      material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
+      material = new THREE.MeshBasicMaterial( { color: color } );
     }
     else{
       type = 'box';
       geometry = new THREE.BoxGeometry(1.0, 1.0, 1.0);
       material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
-      pos = {x: 0.5, y: 1.0, z: 1.0};
     }
     var newMesh = new THREE.Mesh(geometry, material);
-    newMesh.position.set(pos.x, pos.y, pos.z)
+    newMesh.position.set(pos.x, pos.y, pos.z);
     scene.add(newMesh);
     objects[objectIndex] = { 
       mesh: newMesh,
@@ -64,9 +62,7 @@ function World(){
   var compute_force_applied = function() {
     for(var key in objects){
       var obj = objects[key];
-      obj.acc.x = obj.force.x;
-      obj.acc.y = obj.force.y;
-      obj.acc.z = obj.force.z;
+      obj.acc = obj.force.divideScalar(obj.mass);
     };
   }
 
@@ -77,10 +73,8 @@ function World(){
         if (key2 == key1) continue;
         var obj2 = objects[key2];
         if(obj1.type == "sphere" && obj2.type == "sphere"){
-          var centers_distance_squared = Math.pow(obj1.pos.x - obj2.pos.x, 2)
-          + Math.pow(obj1.pos.y - obj2.pos.y, 2) 
-          + Math.pow(obj1.pos.z - obj2.pos.z, 2);
-          if(centers_distance_squared <= Math.pow(obj1.mesh.geometry.parameters.radius + obj2.mesh.geometry.parameters.radius,2)){
+          var centers_distance = obj1.pos.distanceTo(obj2.pos);
+          if(centers_distance <= obj1.mesh.geometry.parameters.radius + obj2.mesh.geometry.parameters.radius){
             console.log(key1 + "collides" + key2);
           }
         }
@@ -96,20 +90,14 @@ function World(){
         continue;
       }
       detect_collision();
-      currObj.pos.x += currObj.vel.x;
-      currObj.pos.y += currObj.vel.y;
-      currObj.pos.z += currObj.vel.z;
-      currObj.vel.x += currObj.acc.x;
-      currObj.vel.y += currObj.acc.y;
-      currObj.vel.z += currObj.acc.z;
-
+      currObj.vel.add(currObj.acc);
+      currObj.pos.add(currObj.vel);
       
+
       currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
       if(currObj.pos.y < objects[0].pos.y + 1.0){
-        currObj.vel.x *= - 0.99;
-        currObj.vel.y *= - 0.99;
-        currObj.vel.z *= - 0.99;
+        currObj.vel.negate();
       }
     }
   }

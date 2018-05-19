@@ -55,13 +55,10 @@ function onDocumentKeyDown(event) {
     }
 };
 
-var objectVelocity = {};
-var objectIsStatic = {};
-
-world.create("plane", {x: 1.0, y: -1.5, z: 1.0}, {x:0, y:0, z:0}, {x:0,y:0,z:0}, true);
-world.create("sphere", {x: 0.5, y: 10, z: 1}, {x: 0, y:-0.008, z:0});
-world.create("sphere", {x: 2, y: 10.0, z: 1.0}, {x: -0.01, y: 0, z: 0});
-world.create("sphere", {x: -2, y: 10.0, z: 1.0}, {x: 0.01, y: 0, z: 0});
+world.create("plane", new THREE.Vector3(1, -1.5, 1), new THREE.Vector3(), new THREE.Vector3(), true);
+world.create("sphere", new THREE.Vector3(0.5, 10, 1), new THREE.Vector3(0, -0.008, 0));
+world.create("sphere", new THREE.Vector3(2, 10, 1), new THREE.Vector3(-0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#FF0000");
+world.create("sphere", new THREE.Vector3(-2, 10, 1), new THREE.Vector3(0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
 
 var plane = objects[0]
 // Render Loop
