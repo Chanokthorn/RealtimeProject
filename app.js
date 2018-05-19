@@ -59,8 +59,9 @@ world.create("plane", new THREE.Vector3(1, -1.5, 1), new THREE.Vector3(), new TH
 world.create("sphere", new THREE.Vector3(0.5, 5, 1), new THREE.Vector3(0, -0.008, 0));
 world.create("sphere", new THREE.Vector3(2, 10, 1), new THREE.Vector3(-0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#FF0000");
 world.create("sphere", new THREE.Vector3(-2, 10, 1), new THREE.Vector3(0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+world.create("sphere", new THREE.Vector3(-20, 10, 1), new THREE.Vector3(0.01, 0, 0), new THREE.Vector3(), false, 2.0, "#00FFFF");
 
-var plane = objects[0]
+var plane = objects[0];
 // Render Loop
 var render = function () {
   requestAnimationFrame( render );

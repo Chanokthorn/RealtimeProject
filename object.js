@@ -15,7 +15,7 @@ function World(){
     console.log('create');
     var geometry, material;
     var vel = new THREE.Vector3();
-    var acc = THREE.Vector3(0.0, gravity, 0.0);
+    var acc = new THREE.Vector3(0.0, 0.0, 0.0);
     if(type === "plane"){
       color = color || "#103F97"
       geometry = new THREE.PlaneGeometry(10, 1);
@@ -60,12 +60,13 @@ function World(){
   }
 
   var compute_force_applied = function() {
-    for(var key in objects){
+    for(var key = 0 ;key < objects.length;key++){
       var obj = objects[key];
+      obj.force.y += (obj.mass * gravity);
       if (obj.force.x == 0 && obj.force.y == 0 && obj.force.z == 0) continue;
       obj.acc = obj.force.divideScalar(obj.mass);
       obj.force = new THREE.Vector3();
-    };
+    }
   }
 
   var detect_collision = function() {
@@ -77,28 +78,32 @@ function World(){
           var centers_distance = obj1.pos.distanceTo(obj2.pos);
           if(centers_distance <= obj1.mesh.geometry.parameters.radius + obj2.mesh.geometry.parameters.radius){
             console.log(key1 + "collides" + key2);
-            // tmp_acc = obj1.acc;
-            // obj1.acc = obj2.acc;
-            // obj2.acc = tmp_acc;
-            // tmp_vel = obj1.vel;
-            // obj1.vel = obj2.vel;
-            // obj2.vel = tmp_vel;
-            [obj1.vel,obj2.vel] = [obj2.vel, obj1.vel];
-            [obj1.acc,obj2.acc] = [obj2.acc, obj1.acc];
+            solve_collision(key1, key2);
           }
         }
       }
     }
   }
 
+  var solve_collision = function(key1, key2){
+    obj1 = objects[key1];
+    obj2 = objects[key2];
+    // tmp_vel = obj1.vel;
+    // obj1.vel = obj2.vel;
+    // obj2.vel = tmp_vel;
+    obj1.force = obj2.acc.multiplyScalar(obj2.mass);
+    obj2.force = obj1.acc.multiplyScalar(obj1.mass);
+    // [obj1.vel,obj2.vel] = [obj2.vel,obj1.vel];  //TODO: not correct when hit in angle
+  }
+
   var updatePosition = function(){
+    detect_collision();
     compute_force_applied();
     for(var key in objects){
       var currObj = objects[key];
       if(currObj.static){
         continue;
       }
-      detect_collision();
       currObj.vel.add(currObj.acc);
       currObj.pos.add(currObj.vel);
       
