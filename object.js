@@ -1,14 +1,21 @@
 function World(){
   var objects = {};
-  const gravity = -0.008;
+  // const gravity = -0.008;
+  const gravity = 0;
   var zero = {x: 0.0,
                 y: 0.0,
                 z: 0.0}
   // this.velocities = {};
   // this.accelerations = {};
   var objectIndex = 0;
-  var createObject = function(type = 'sphere', pos = zero, rot = zero, static = false, mass = 1.0){
+  var createObject = function(type = 'sphere', 
+                              pos = {x: 0, y: 0, z: 0}, 
+                              force = {x: 0, y: 0, z: 0},
+                              rot = zero, 
+                              static = false, 
+                              mass = 1.0) {
     console.log('create');
+    console.log(pos)
     var geometry, material;
     var vel = {x: 0.0, y: 0.0, z: 0.0};
     var acc = {x: 0.0, y: gravity, z: 0.0};
@@ -18,7 +25,6 @@ function World(){
     } else if(type === "sphere"){
       geometry = new THREE.SphereGeometry(1.0, 10.0, 10.0);
       material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
-      pos = {x: 0.5, y: 10.0, z: 1.0};
     }
     else{
       type = 'box';
@@ -38,7 +44,8 @@ function World(){
       rot: rot,
       vel: vel,
       acc: acc,
-      static: static
+      static: static,
+      force: force
     };
 
     compute_moment_of_inertia(objects[objectIndex])
@@ -54,18 +61,48 @@ function World(){
     }
   }
 
+  var compute_force_applied = function() {
+    for(var key in objects){
+      var obj = objects[key];
+      obj.acc.x = obj.force.x;
+      obj.acc.y = obj.force.y;
+      obj.acc.z = obj.force.z;
+    };
+  }
+
+  var detect_collision = function() {
+    for(var key1 in objects){
+      var obj1 = objects[key1];
+      for(var key2 in objects){
+        if (key2 == key1) continue;
+        var obj2 = objects[key2];
+        if(obj1.type == "sphere" && obj2.type == "sphere"){
+          var centers_distance_squared = Math.pow(obj1.pos.x - obj2.pos.x, 2)
+          + Math.pow(obj1.pos.y - obj2.pos.y, 2) 
+          + Math.pow(obj1.pos.z - obj2.pos.z, 2);
+          if(centers_distance_squared <= Math.pow(obj1.mesh.geometry.parameters.radius + obj2.mesh.geometry.parameters.radius,2)){
+            console.log(key1 + "collides" + key2);
+          }
+        }
+      }
+    }
+  }
+
   var updatePosition = function(){
+    compute_force_applied();
     for(var key in objects){
       var currObj = objects[key];
       if(currObj.static){
         continue;
       }
+      detect_collision();
       currObj.pos.x += currObj.vel.x;
       currObj.pos.y += currObj.vel.y;
       currObj.pos.z += currObj.vel.z;
       currObj.vel.x += currObj.acc.x;
       currObj.vel.y += currObj.acc.y;
       currObj.vel.z += currObj.acc.z;
+
       
       currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
