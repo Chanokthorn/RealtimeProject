@@ -39,8 +39,7 @@ function World(){
       vel: vel,
       acc: acc,
       static: static,
-      force: force,
-      radius: 1
+      force: force
     };
 
     compute_moment_of_inertia(objects[objectIndex])
