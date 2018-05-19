@@ -1,5 +1,5 @@
 function World(){
-  var objects = {};
+  var objects = [];
   // const gravity = -0.008;
   const gravity = 0;
   // this.velocities = {};
@@ -33,7 +33,7 @@ function World(){
     var newMesh = new THREE.Mesh(geometry, material);
     newMesh.position.set(pos.x, pos.y, pos.z);
     scene.add(newMesh);
-    objects[objectIndex] = { 
+    objects.push({ 
       mesh: newMesh,
       type: type,
       mass: mass,
@@ -44,7 +44,7 @@ function World(){
       acc: acc,
       static: static,
       force: force
-    };
+    });
 
     compute_moment_of_inertia(objects[objectIndex])
     objectIndex++;
@@ -62,20 +62,29 @@ function World(){
   var compute_force_applied = function() {
     for(var key in objects){
       var obj = objects[key];
+      if (obj.force.x == 0 && obj.force.y == 0 && obj.force.z == 0) continue;
       obj.acc = obj.force.divideScalar(obj.mass);
+      obj.force = new THREE.Vector3();
     };
   }
 
   var detect_collision = function() {
-    for(var key1 in objects){
+    for(var key1 = 0;key1 < objects.length - 1;key1++){
       var obj1 = objects[key1];
-      for(var key2 in objects){
-        if (key2 == key1) continue;
+      for(var key2 = key1 + 1;key2 < objects.length;key2++){
         var obj2 = objects[key2];
         if(obj1.type == "sphere" && obj2.type == "sphere"){
           var centers_distance = obj1.pos.distanceTo(obj2.pos);
           if(centers_distance <= obj1.mesh.geometry.parameters.radius + obj2.mesh.geometry.parameters.radius){
             console.log(key1 + "collides" + key2);
+            // tmp_acc = obj1.acc;
+            // obj1.acc = obj2.acc;
+            // obj2.acc = tmp_acc;
+            // tmp_vel = obj1.vel;
+            // obj1.vel = obj2.vel;
+            // obj2.vel = tmp_vel;
+            [obj1.vel,obj2.vel] = [obj2.vel, obj1.vel];
+            [obj1.acc,obj2.acc] = [obj2.acc, obj1.acc];
           }
         }
       }
@@ -93,9 +102,9 @@ function World(){
       currObj.vel.add(currObj.acc);
       currObj.pos.add(currObj.vel);
       
-
       currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
+      // bounce on floor
       if(currObj.pos.y < objects[0].pos.y + 1.0){
         currObj.vel.negate();
       }
