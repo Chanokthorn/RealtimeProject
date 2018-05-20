@@ -55,11 +55,19 @@ function onDocumentKeyDown(event) {
     }
 };
 
-world.create("plane", new THREE.Vector3(1, -1.5, 1), new THREE.Vector3(), new THREE.Vector3(), true);
-world.create("sphere", new THREE.Vector3(0.5, 12, 1), new THREE.Vector3(0, -0.008, 0));
-world.create("sphere", new THREE.Vector3(2, 10, 1), new THREE.Vector3(-0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#FF0000");
-world.create("sphere", new THREE.Vector3(-2, 10, 1), new THREE.Vector3(0.01, 0, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
-world.create("sphere", new THREE.Vector3(-20, 10, 1), new THREE.Vector3(0.01, 0, 0), new THREE.Vector3(), false, 2.0, "#00FFFF");
+world.create("plane", new THREE.Vector3(1, -1.5, 1), new THREE.Vector3(0, 0, 0), new THREE.Vector3(), true, 3.0, "#00FF00");
+// world.create("sphere", new THREE.Vector3(1, 10, 1), new THREE.Vector3(0, -0.008, 0),new THREE.Vector3(), false, 1.0, "FF0000");
+world.create("sphere", new THREE.Vector3(2.5, 10, 1), new THREE.Vector3(-0.001, 0, 0), new THREE.Vector3(), false, 1.0, "#FF0000");
+world.create("sphere", new THREE.Vector3(-2.5, 10, 1), new THREE.Vector3(0, 0, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+// world.create("sphere", new THREE.Vector3(2.5, 8, 1), new THREE.Vector3(-0.01, 0.008, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+// world.create("sphere", new THREE.Vector3(-2.5, 5, 1), new THREE.Vector3(0.01, -0.08, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+// world.create("sphere", new THREE.Vector3(0, 14, 1), new THREE.Vector3(0.01, 0.008, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+// world.create("sphere", new THREE.Vector3(0, 10.4, 1), new THREE.Vector3(0, 0, 0), new THREE.Vector3(), false, 1.0, "#00FF00");
+
+var box = new THREE.Box3();
+box.setFromObject(objects[0].mesh);
+console.log(box);
+// world.create("sphere", new THREE.Vector3(-20, 10, 1), new THREE.Vector3(0.1, 0, 0), new THREE.Vector3(), false, 2.0, "#00FFFF");
 
 var plane = objects[0];
 // Render Loop
