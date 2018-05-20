@@ -61,13 +61,15 @@ function World(){
   }
 
   var compute_force_applied = function() {
+    // console.log("before force: ",objects[2].acc);
     for(var key = 0 ;key < objects.length;key++){
       var obj = objects[key];
-      obj.force.y += (obj.mass * gravity);
+      // obj.force.y += (obj.mass * gravity);
       if (obj.force.x == 0 && obj.force.y == 0 && obj.force.z == 0) continue;
       obj.acc = obj.force.divideScalar(obj.mass);
-      obj.force = new THREE.Vector3();
+      // obj.force = new THREE.Vector3();
     }
+    // console.log("after force: ",objects[2].acc);
   }
 
   var detect_collision = function() {
@@ -81,28 +83,60 @@ function World(){
             console.log(key1 + "collides" + key2);
             solve_collision(key1, key2);
           }
+          // obj1.mesh.geometry.computeBoundingSphere();
+          // obj2.mesh.geometry.computeBoundingSphere();
+          // var sphere1 = obj1.mesh.geometry.boundingSphere;
+          // sphere1.set(obj1.pos, )
+          // var sphere2 = obj2.mesh.geometry.boundingSphere;
+          // if(sphere1.intersectsSphere(sphere2)){
+          //     // console.log(key1 + "collides" + key2);
+          //     console.log("bs1 ",obj1.mesh.geometry.boundingSphere);
+          //     console.log("sphere1 ",sphere1)
+          //     solve_collision(key1, key2);
+          // }
         }
+        if((obj1.type == "plane" && obj2.type == "sphere")){
+          var bbs = new THREE.Box3();
+          var bbp = new THREE.Box3();
+          bbs.setFromObject(obj2.mesh);
+          bbp.setFromObject(obj1.mesh);
+          if(bbs.intersectsBox(bbp)){
+            solve_collision(key1,key2);
+            // console.log(obj1.acc);
+            // console.log(obj2.acc);
+            console.log("intersected")
+          }
+        }
+  
       }
+
     }
   }
 
   var solve_collision = function(key1, key2){
+    console.log("key1: ",key1);
+    console.log("key2: ",key2);
     obj1 = objects[key1];
     obj2 = objects[key2];
     // tmp_vel = obj1.vel;
     // obj1.vel = obj2.vel;
     // obj2.vel = tmp_vel;
-    obj1.force = obj2.acc.multiplyScalar(obj2.mass);
-    obj2.force = obj1.acc.multiplyScalar(obj1.mass);
+    // obj1acc = new THREE.Vector3(obj1.acc.x, obj1.acc.y, obj1.acc.z);
+    // obj2acc = new THREE.Vector3(obj2.acc.x, obj2.acc.y, obj2.acc.z);
+    // obj1.force = obj2acc.multiplyScalar(obj2.mass);
+    // obj2.force = obj1acc.multiplyScalar(obj1.mass);
+    // console.log("solve col: ",objects[2].acc);
     // [obj1.vel,obj2.vel] = [obj2.vel,obj1.vel];  //TODO: not correct when hit in angle
-    var newVel1 = compute_impulse(key1,key2);
+    
     var newVel2 = compute_impulse(key2,key1);
-    obj1.vel.add(newVel1);
-    // console.log("vel1: ", obj1.vel);
-    // console.log("neVel1: ", newVel1)
-    obj2.vel.add(newVel2);
-    // console.log("obj1 vel:" + obj1.vel)
-    // console.log("neVel1: " + newVel1);    
+    if(!obj1.static){
+      var newVel1 = compute_impulse(key1,key2);
+      obj1.vel.add(newVel1);
+    }
+    if(!obj2.static){
+      obj2.vel.add(newVel2);
+    }
+    // console.log("after after solve col: ",objects[2].acc)
 
   }
 
@@ -123,6 +157,12 @@ function World(){
     console.log("n0: ", n);
     n = n.divideScalar(obj1.pos.distanceTo(obj2.pos));
     console.log("n1: ", n);
+
+    // var pre_distance = obj1.pos.distanceTo(obj2.pos);
+    // var tmp1 = new THREE.Vector3(obj1.pos.x, obj1.pos.y, obj1.pos.z);
+    // var tmp2 = new THREE.Vector3(obj2.pos.x, obj2.pos.y, obj2.pos.z);
+    // var post_distance = (tmp1.add())
+
     var velRelPre = new THREE.Vector3();
     velRelPre.subVectors(vel1,vel2).dot(n);
     console.log("velRelPre: ",velRelPre)
@@ -136,8 +176,10 @@ function World(){
   
 
   var updatePosition = function(){
+    // console.log("before update: ",objects[2].acc)
     detect_collision();
     compute_force_applied();
+    // console.log("after update: ",objects[2].acc)
     for(var key in objects){
       var currObj = objects[key];
       if(currObj.static){
@@ -149,9 +191,9 @@ function World(){
       currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
       // bounce on floor
-      if(currObj.pos.y < objects[0].pos.y + 1.0){
-        currObj.vel.y *= -1;
-      }
+      // if(currObj.pos.y < objects[0].pos.y + 1.0){
+      //   currObj.vel.y *= -1;
+      // }
     }
   }
 
