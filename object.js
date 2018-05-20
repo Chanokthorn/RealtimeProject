@@ -95,16 +95,32 @@ function World(){
           //     solve_collision(key1, key2);
           // }
         }
-        if((obj1.type == "plane" && obj2.type == "sphere")){
+        if((obj1.type == "plane" && obj2.type == "sphere")||
+          (obj1.type == "sphere" && obj2.type == "plane")){
+          if(obj1.type == 'plane'){
+            var obj_plane = obj1;
+            var obj_sphere = obj2;
+          }else{
+            var obj_plane = obj2;
+            var obj_sphere = obj1;
+          }
           var bbs = new THREE.Box3();
           var bbp = new THREE.Box3();
-          bbs.setFromObject(obj2.mesh);
-          bbp.setFromObject(obj1.mesh);
+          bbs.setFromObject(obj_sphere.mesh);
+          bbp.setFromObject(obj_plane.mesh);
           if(bbs.intersectsBox(bbp)){
             solve_collision(key1,key2);
             // console.log(obj1.acc);
             // console.log(obj2.acc);
             console.log("intersected")
+            var contact_point = new THREE.Vector3();
+            var normal = obj1.up;
+            var plane = new THREE.Plane(normal); // TODO : should add constant  distant too
+            var projection = new THREE.Vector3();
+            plane.projectPoint(obj_sphere.pos);
+            var sphere = new THREE.Sphere(obj_sphere.pos);
+            sphere.clampPoint(projection, contact_point);
+            console.log("contact point",contact_point);
           }
         }
   
@@ -187,7 +203,7 @@ function World(){
       }
       currObj.vel.add(currObj.acc);
       currObj.pos.add(currObj.vel);
-      
+
       currObj.mesh.position.set(currObj.pos.x, currObj.pos.y, currObj.pos.z);
 
       // bounce on floor
