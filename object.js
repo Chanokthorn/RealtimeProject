@@ -1,5 +1,6 @@
 function World(){
   var objects = [];
+  var epsilon = 0.7;
   // const gravity = -0.008;
   const gravity = 0;
   // this.velocities = {};
@@ -94,7 +95,45 @@ function World(){
     obj1.force = obj2.acc.multiplyScalar(obj2.mass);
     obj2.force = obj1.acc.multiplyScalar(obj1.mass);
     // [obj1.vel,obj2.vel] = [obj2.vel,obj1.vel];  //TODO: not correct when hit in angle
+    var newVel1 = compute_impulse(key1,key2);
+    var newVel2 = compute_impulse(key2,key1);
+    obj1.vel.add(newVel1);
+    // console.log("vel1: ", obj1.vel);
+    // console.log("neVel1: ", newVel1)
+    obj2.vel.add(newVel2);
+    // console.log("obj1 vel:" + obj1.vel)
+    // console.log("neVel1: " + newVel1);    
+
   }
+
+  var compute_impulse = function(key1, key2){
+    obj1 = objects[key1];
+    obj2 = objects[key2];
+    var vel1 = new THREE.Vector3(obj1.vel.x, obj1.vel.y, obj1.vel.z);
+    var vel2 = new THREE.Vector3(obj2.vel.x, obj2.vel.y, obj2.vel.z);
+    var pos1 = new THREE.Vector3(obj1.pos.x, obj1.pos.y, obj1.pos.z);
+    var pos2 = new THREE.Vector3(obj2.pos.x, obj2.pos.y, obj2.pos.z);
+    var velr = new THREE.Vector3();
+    var n = new THREE.Vector3();
+    velr.addVectors(vel1,vel2);
+    // console.log("pos1: ",pos1);
+    // console.log("obj1.pos: ",obj1.pos);
+    // console.log("vel1: ",vel1);
+    n.subVectors((pos1), (pos2));
+    console.log("n0: ", n);
+    n = n.divideScalar(obj1.pos.distanceTo(obj2.pos));
+    console.log("n1: ", n);
+    var velRelPre = new THREE.Vector3();
+    velRelPre.subVectors(vel1,vel2).dot(n);
+    console.log("velRelPre: ",velRelPre)
+    var j = (-(1 + epsilon) * velRelPre.length()) / (1/obj1.mass + 1/obj2.mass);
+    var newVel1 = new THREE.Vector3(n.x, n.y, n.z);
+    newVel1.multiplyScalar(j);
+    newVel1.divideScalar(obj1.mass);
+    console.log("j: ",j);
+    return newVel1;
+  }
+  
 
   var updatePosition = function(){
     detect_collision();
