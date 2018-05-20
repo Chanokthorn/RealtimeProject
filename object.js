@@ -150,7 +150,7 @@ function World(){
 
       // bounce on floor
       if(currObj.pos.y < objects[0].pos.y + 1.0){
-        currObj.vel.negate();
+        currObj.vel.y *= -1;
       }
     }
   }
