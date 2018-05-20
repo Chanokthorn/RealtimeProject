@@ -9,8 +9,11 @@ var scene = new THREE.Scene();
 var world = new World();
 var objects = world.objects;
 
+var frustumSize = 50;
 // Create a basic perspective camera
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var aspect = window.innerWidth / window.innerHeight;
+camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1, 2000);
 camera.position.z = 20;
 
 // Create a renderer with Antialiasing
