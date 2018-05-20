@@ -114,12 +114,13 @@ function World(){
             // console.log(obj2.acc);
             console.log("intersected")
             var contact_point = new THREE.Vector3();
-            var normal = obj1.up;
+            var normal = obj_plane.up;
             var plane = new THREE.Plane(normal); // TODO : should add constant  distant too
             var projection = new THREE.Vector3();
-            plane.projectPoint(obj_sphere.pos);
+            plane.projectPoint(obj_sphere.pos,projection);
             var sphere = new THREE.Sphere(obj_sphere.pos);
             sphere.clampPoint(projection, contact_point);
+            console.log('projection',projection);
             console.log("contact point",contact_point);
           }
         }
